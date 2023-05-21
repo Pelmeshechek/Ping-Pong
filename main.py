@@ -51,15 +51,23 @@ class ball(GameSprite):
 
 lastReloadTime = 0
 
-racket1 = player('racket.png', 40, 175, 0, 5, 40, 100)
-racket2 = player('racket.png', 590, 175, 0, 5, 40, 100)
-ball = ball('ball.png', 225, 325, 6, 4, 50, 50)
+racket1 = player('racket.png', 40, 200, 0, 5, 40, 100)
+racket2 = player('racket.png', 620, 200, 0, 5, 40, 100)
+ball = ball('ball.png', 325, 225, 4*(choice([-1,1])), 5.5*(choice([-1,1])), 50, 50)
 
 font.init()
 write = font.SysFont('arial', 24)
+write_aa = font.SysFont('arial', 48)
+
+right_score = 0
+left_score = 0
 
 losed = write.render('LOSE', 1, (255,0,0))
 won = write.render('WIN', 1, (0,255,0))
+right_score_wr = write.render(f'{right_score}', 1, (0,255,255))
+left_score_wr = write.render(f'{left_score}', 1, (0,255,255))
+losed_aa = write_aa.render('LOSED', 1, (255,0,0))
+won_aa = write_aa.render('WON', 1, (0,255,0))
 
 
 clock = time.Clock()
@@ -88,18 +96,18 @@ while game:
 
 
     if (t.time() - lastReloadTime > 3) and reloading:
-        ball.rect.x = 225
-        ball.rect.y = 325
-        racket1.rect.y = 175
-        racket2.rect.y = 175
+        ball.rect.x = 325
+        ball.rect.y = 225
+        racket1.rect.y = 200
+        racket2.rect.y = 200
         reloading = False
 
     if ball.rect.x < 71:
-        window.blit(losed, (90,15))
-        window.blit(won, (515,15))
-    elif ball.rect.x > 549:
-        window.blit(losed, (515,15))
-        window.blit(won, (90,15))
+        window.blit(losed, (100,15))
+        window.blit(won, (535,15))
+    elif ball.rect.x > 579:
+        window.blit(losed, (535,15))
+        window.blit(won, (100,15))
 
 
     if ball.rect.x < 69:
@@ -107,11 +115,36 @@ while game:
         ball.rect.x += 1
         reloading = True
         lastReloadTime = t.time()
-    elif ball.rect.x > 551:
+        ball.speed_x *= choice([-1,1])
+        ball.speed_y *= choice([-1,1])
+    elif ball.rect.x > 581:
         ball.speed_x *= -1
         ball.rect.x -= 1
         reloading = True
         lastReloadTime = t.time()
+        ball.speed_x *= choice([-1,1])
+        ball.speed_y *= choice([-1,1])
+
+
+    if ball.rect.x > 583:
+        left_score += 1
+    elif ball.rect.x < 67:
+        right_score += 1
+
+    right_score_wr = write.render(f'{right_score}', 1, (0,255,255))
+    left_score_wr = write.render(f'{left_score}', 1, (0,255,255))
+
+    window.blit(right_score_wr, (620,15))
+    window.blit(left_score_wr, (65,15))
+
+    if left_score >= 5:
+        window.blit(losed_aa, (410,200))
+        window.blit(won_aa, (120,200))
+        finish = True
+    elif right_score >= 5:
+        window.blit(won_aa, (430,200))
+        window.blit(losed_aa, (120,200))
+        finish = True
 
 
     display.update()
